@@ -1,0 +1,219 @@
+name: Windows 2019
+
+on: 
+
+  workflow_dispatch:
+
+    inputs:
+
+      code:
+
+        description: 'Chrome Remote Desktop Code | Windows (PowerShell)'
+
+        required: true
+
+      pin:
+
+        description: 'PIN (6 Digits)'
+
+        required: true
+
+      time:
+
+        description: 'VM Time (Seconds, Maximum 72 hours)'
+
+        required: true
+
+        default: "21600"
+
+jobs:
+
+  build:
+
+    runs-on: windows-2019
+
+    steps:
+
+    - name: Doanload & Install
+
+      run: | 
+
+        Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+
+        echo "Download & Install: Chrome"
+
+        & {$P = $env:TEMP + '\chrome_installer.exe'; Invoke-WebRequest 'https://dl.google.com/chrome/install/latest/chrome_installer.exe' -OutFile $P; Start-Process -FilePath $P -Args '/install' -Verb RunAs -Wait; Remove-Item $P}
+
+        echo "Download & Install: Chrome Remote Desktop"
+
+        & {$P = $env:TEMP + '\chromeremotedesktophost.msi'; Invoke-WebRequest 'https://dl.google.com/edgedl/chrome-remote-desktop/chromeremotedesktophost.msi' -OutFile $P; Start-Process $P -Wait; Remove-Item $P}
+
+        Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
+
+        Invoke-WebRequest https://github.com/wszgr-2020/GitHub-Action-RDP/raw/main/Windows/NGROK-AP.bat -OutFile NGROK-AP.bat
+
+        Invoke-WebRequest https://github.com/wszgr-2020/GitHub-Action-RDP/raw/main/Windows/user-create.bat -OutFile user-create.bat
+
+        Invoke-WebRequest https://github.com/wszgr-2020/GitHub-Action-RDP/raw/main/Windows/info.bat -OutFile info.bat
+
+    - name: Start Chrome Remote Desktop
+
+      run: ${{ github.event.inputs.code }} -pin=${{ github.event.inputs.pin }}
+
+    - name: Extracting Ngrok Files.
+
+      run: Expand-Archive ngrok.zip
+
+    - name: Connecting to your Ngrok account.
+
+      run: .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
+
+      env:
+
+        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+
+    - name: Enable RDP Access.
+
+      run: | 
+
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
+
+        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
+
+    - name: Creating Tunnel.
+
+      run: Start-Process Powershell -ArgumentList '-Noexit -Command ".\ngrok\ngrok.exe tcp 3389"'
+
+    - name: Connecting to your RDP.
+
+      run: cmd /c user-create.bat
+
+    - name: VM Info.
+
+      run: cmd /c info.bat
+
+    - name: Done! You can see the machine in list now.
+
+      run: echo "OK"
+
+    - name: For keep VM alive (1)
+
+      run: | 
+
+        $vmtime = ${{ github.event.inputs.time }} / 12
+
+        Start-Sleep -Seconds $vmtime
+
+        echo "OK"
+
+    - name: For keep VM alive (2)
+
+      run: | 
+
+        $vmtime = ${{ github.event.inputs.time }} / 12
+
+        Start-Sleep -Seconds $vmtime
+
+        echo "OK"
+
+    - name: For keep VM alive (3)
+
+      run: | 
+
+        $vmtime = ${{ github.event.inputs.time }} / 12
+
+        Start-Sleep -Seconds $vmtime
+
+        echo "OK"
+
+    - name: For keep VM alive (4)
+
+      run: | 
+
+        $vmtime = ${{ github.event.inputs.time }} / 12
+
+        Start-Sleep -Seconds $vmtime
+
+        echo "OK"
+
+    - name: For keep VM alive (5)
+
+      run: | 
+
+        $vmtime = ${{ github.event.inputs.time }} / 12
+
+        Start-Sleep -Seconds $vmtime
+
+        echo "OK"
+
+    - name: For keep VM alive (6)
+
+      run: | 
+
+        $vmtime = ${{ github.event.inputs.time }} / 12
+
+        Start-Sleep -Seconds $vmtime
+
+        echo "OK"
+
+    - name: For keep VM alive (7)
+
+      run: | 
+
+        $vmtime = ${{ github.event.inputs.time }} / 12
+
+        Start-Sleep -Seconds $vmtime
+
+        echo "OK"
+
+    - name: For keep VM alive (8)
+
+      run: | 
+
+        $vmtime = ${{ github.event.inputs.time }} / 12
+
+        Start-Sleep -Seconds $vmtime
+
+        echo "OK"
+
+    - name: For keep VM alive (9)
+
+      run: | 
+
+        $vmtime = ${{ github.event.inputs.time }} / 12
+
+        Start-Sleep -Seconds $vmtime
+
+        echo "OK"
+
+    - name: For keep VM alive (10)
+
+      run: | 
+
+        $vmtime = ${{ github.event.inputs.time }} / 12
+
+        Start-Sleep -Seconds $vmtime
+
+        echo "OK"
+
+    - name: For keep VM alive (11)
+
+      run: | 
+
+        $vmtime = ${{ github.event.inputs.time }} / 12
+
+        Start-Sleep -Seconds $vmtime
+
+        echo "OK"
+
+    - name: For keep VM alive (12)
+
+      run: | 
+
+        $vmtime = ${{ github.event.inputs.time }} / 12
+
+        Start-Sleep -Seconds $vmtime
+
+        echo "OK"
